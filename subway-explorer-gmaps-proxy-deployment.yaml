@@ -1,0 +1,17 @@
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: subway-explorer-gmaps-proxy-deployment
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: subway-explorer-gmaps-proxy-pod
+    spec:
+      containers:
+        - name: subway-explorer-gmaps-proxy-container
+          image: residentmario/subway-explorer-gmaps-proxy
+          ports:
+            - name: http
+              containerPort: 9000

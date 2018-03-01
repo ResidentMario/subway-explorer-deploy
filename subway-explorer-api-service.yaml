@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: subway-explorer-api-service
+  labels:
+    app: subway-explorer-api-service
+spec:
+  ports:
+  - port: 3000
+    protocol: TCP
+  selector:
+    app: subway-explorer-api-pod
+

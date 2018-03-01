@@ -1,0 +1,17 @@
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: subway-explorer-api-deployment
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: subway-explorer-api-pod
+    spec:
+      containers:
+        - name: subway-explorer-api-container
+          image: residentmario/subway-explorer-api
+          ports:
+            - name: http
+              containerPort: 3000

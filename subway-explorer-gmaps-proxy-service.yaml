@@ -1,0 +1,12 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: subway-explorer-api-gmaps-proxy-service
+spec:
+  selector:
+    app: subway-explorer-api-gmaps-proxy-deployment
+    tier: backend
+  ports:
+  - protocol: TCP
+    port: 9000
+    targetPort: http
