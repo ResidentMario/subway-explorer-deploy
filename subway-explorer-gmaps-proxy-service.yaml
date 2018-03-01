@@ -1,10 +1,10 @@
 kind: Service
 apiVersion: v1
 metadata:
-  name: subway-explorer-api-gmaps-proxy-service
+  name: subway-explorer-gmaps-proxy-service
 spec:
   selector:
-    app: subway-explorer-api-gmaps-proxy-deployment
+    app: subway-explorer-gmaps-proxy-pod
     tier: backend
   ports:
   - protocol: TCP
