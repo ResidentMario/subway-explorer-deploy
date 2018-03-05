@@ -7,7 +7,7 @@ spec:
   template:
     metadata:
       labels:
-        app: subway-explorer-webapp-node
+        app: subway-explorer-webapp-pod
     spec:
       containers:
         - name: subway-explorer-webapp-container
