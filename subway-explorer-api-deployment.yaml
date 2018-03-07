@@ -17,9 +17,11 @@ spec:
               containerPort: 3000
           volumeMounts:
             - name: subway-explorer-datastore
-              mountPath: /
+              mountPath: /mnt/subway-explorer-datastore/
       volumes:
         - name: subway-explorer-datastore
           gcePersistentDisk:
             pdName: subway-explorer-datastore
             fsType: ext4
+      nodeSelector:
+        datastore_node: "true"
