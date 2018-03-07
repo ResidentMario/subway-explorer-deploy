@@ -15,3 +15,11 @@ spec:
           ports:
             - name: http
               containerPort: 3000
+          volumeMounts:
+            - name: subway-explorer-datastore
+              mountPath: /
+      volumes:
+        - name: subway-explorer-datastore
+          gcePersistentDisk:
+            pdName: subway-explorer-datastore
+            fsType: ext4
