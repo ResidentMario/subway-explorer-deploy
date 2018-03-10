@@ -70,17 +70,36 @@ Once the disk is formatted, run the following command to attach that disk to the
 
 ### Step 4: Copy the database to the volume
 
-Use scp (https://cloud.google.com/sdk/gcloud/reference/compute/scp) to copy the database off of local disc and onto the cloud. TODO
+Next you need to copy the database off of your local machine and onto the disc. You can do this using the
+[`gcloud scp`](https://cloud.google.com/sdk/gcloud/reference/compute/scp) command (itself a thin wrapper on UNIX 
+`scp`, shorthand for "secure copy").
 
-https://stackoverflow.com/questions/49162126/google-compute-engine-reports-a-read-only-disc
+This should look something like this:
+
+    gcloud compute scp ~/Desktop/subway-explorer-api/logbooks.sqlite gke-subway-explorer-default-pool-2bef4d1d-f7dn:/mnt/disks/subway-explorer-datastore
+
+Substituting the node ID for the ID of the volume-mounted node in your own cluster.
+
+For instructions on generating your own database refer to the [`subway-explorer-api`](https://github.com/ResidentMario/subway-explorer-api) `README.md`.
 
 ### Step 5: Initialize the database service
 
 Now that you have a database set up, mounted to your chosen node, and seeded wth data, it's time to deploy [`subway-explorer-api`](https://github.com/ResidentMario/subway-explorer-api), the database service.
 
-First you need to make the node with the right volume attached locatable. You can do this by labelling the node, as described in "[Assinging Pods to Nodes](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/)". Run the following:
+First we need to assign a label to the node we mounted the data on in the previous step. This will make the node 
+locatable. We'll use this label to ensure our database pod is assigned to this node only when it's created (as per 
+"[Assinging Pods to Nodes](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/)").
+
+To label the node, run the following command:
 
     kubectl label nodes gke-webapp-default-pool-49338587-d78l datastore_node=true
+
+Substitute in the name of your database node.
+
+Next we need to populate an environment variable in the pod pointing to the database. You can do this by running the 
+following:
+
+    kubectl create configmap database-config-map --from-env-file=api-database-config-map.env
 
 Great, now you're ready to deploy the API service!
 
@@ -89,7 +108,23 @@ kubectl create -f subway-explorer-api-deployment.yaml
 kubectl create -f subway-explorer-api-service.yaml
 ```
 
-TODO: comamnd for testing that it worked.
+To check that things are operating correctly, step into the pod (substitute the name for your pod name):
+
+```sh
+kubectl exec -it subway-explorer-api-deployment-7889bf8988-zl82b bash
+```
+
+To check that the environment variable is populating correctly:
+
+```sh
+node -e "console.log(process.env.DATABASE_FILEPATH)"
+```
+
+To check that the container is functioning correctly:
+
+```
+npx mocha test
+```
 
 ### Step 6: Initialize the front-end application
 
