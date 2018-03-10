@@ -18,6 +18,13 @@ spec:
           volumeMounts:
             - name: subway-explorer-datastore
               mountPath: /mnt/subway-explorer-datastore/
+          env:
+            - name: DATABASE_FILEPATH
+              valueFrom:
+                configMapKeyRef:
+                  name: database-config-map
+                  key: DATABASE_FILEPATH
+
       volumes:
         - name: subway-explorer-datastore
           gcePersistentDisk:

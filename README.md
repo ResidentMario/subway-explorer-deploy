@@ -59,7 +59,10 @@ Start by running the following:
 
 Select a node in your cluster which will run the `subway-explorer-api` pod. Any node that isn't already under high load will do. You can pick one by e.g. visiting your [Cloud Console](https://console.cloud.google.com/) and looking around.
 
-Once you have the ID of the node you want to run the database on, run the following command to attach that disk to the node:
+Once you have the ID of the node you want to run the database on, follow the instructions at ["Add persistent disk"](https://cloud.google.com/compute/docs/disks/add-persistent-disk#create_disk) on formatting the disk. The `[MNT_DIR]` in this document is the node ID you just looked up.
+ 
+ 
+Once the disk is formatted, run the following command to attach that disk to the node:
 
     gcloud compute instances attach-disk subway-explorer-datastore --disk NODE_ID
 
@@ -68,6 +71,8 @@ Once you have the ID of the node you want to run the database on, run the follow
 ### Step 4: Copy the database to the volume
 
 Use scp (https://cloud.google.com/sdk/gcloud/reference/compute/scp) to copy the database off of local disc and onto the cloud. TODO
+
+https://stackoverflow.com/questions/49162126/google-compute-engine-reports-a-read-only-disc
 
 ### Step 5: Initialize the database service
 
@@ -84,7 +89,7 @@ kubectl create -f subway-explorer-api-deployment.yaml
 kubectl create -f subway-explorer-api-service.yaml
 ```
 
-TODO: testing that it worked.
+TODO: comamnd for testing that it worked.
 
 ### Step 6: Initialize the front-end application
 
