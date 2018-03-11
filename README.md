@@ -104,6 +104,7 @@ following:
 Great, now you're ready to deploy the API service!
 
 ```sh
+kubectl create configmap database-config-map --from-env-file=api-database-config-map.env
 kubectl create -f subway-explorer-api-deployment.yaml
 kubectl create -f subway-explorer-api-service.yaml
 ```
@@ -129,5 +130,7 @@ npx mocha test
 ### Step 6: Initialize the front-end application
 
 It's finally time to spin up the application front-end, [`subway-explorer-webapp`](https://github.com/ResidentMario/subway-explorer-webapp).
+
+Note: https://stackoverflow.com/a/49216574/1993206
 
 TODO
