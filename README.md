@@ -1,9 +1,7 @@
 ## About
 
 This repository contains (most of) the object definitions necessary for deploying the `Subway Explorer` application via 
-the [Kubernetes](https://kubernetes.io/docs/concepts/storage/volumes/) SaaS platform.
-
-This document is a WIP.
+[Kubernetes](https://kubernetes.io/docs/concepts/storage/volumes/) container orchestration and [Google Compute Engine](https://cloud.google.com/compute/).
 
 ## Quickstart
 
@@ -47,7 +45,7 @@ kubectl create -f subway-explorer-gmaps-proxy-deployment.yaml
 kubectl create -f subway-explorer-gmaps-proxy-service.yaml
 ```
 
-That's it---the service is deployed! To verify everything went correctly, run `kubectl get pods` and find the `gmaps-proxy` pod. `kubectl exec -it POD_NAME bash` to get inside the pod, then run `wget https://localhost:9000/status; cat status`. If all is well the result will be `{status: "OK"}`. You can then run `rm status` to get rid of the junk file, and then `exit` the pod.
+To verify the service created successfully, run `kubectl get pods` and find the `gmaps-proxy` pod. `kubectl exec -it POD_NAME bash` to get inside the pod, then run `wget https://localhost:9000/status; cat status`. If all is well the result will be `{status: "OK"}`. You can then run `rm status` to get rid of the junk file, and then `exit` the pod.
 
 ### Step 3: Mount a volume for the database
 
@@ -55,18 +53,17 @@ Next we need to create a disk and mount it. These instructions mostly follow fro
 
 Start by running the following: 
 
-    gcloud compute disks create subway-explorer-datastore --size 2
+    gcloud compute disks create subway-explorer-datastore --size 10
 
 Select a node in your cluster which will run the `subway-explorer-api` pod. Any node that isn't already under high load will do. You can pick one by e.g. visiting your [Cloud Console](https://console.cloud.google.com/) and looking around.
 
-Once you have the ID of the node you want to run the database on, follow the instructions at ["Add persistent disk"](https://cloud.google.com/compute/docs/disks/add-persistent-disk#create_disk) on formatting the disk. The `[MNT_DIR]` in this document is the node ID you just looked up.
- 
- 
-Once the disk is formatted, run the following command to attach that disk to the node:
+Run the following command to attach that disk to the node:
 
     gcloud compute instances attach-disk subway-explorer-datastore --disk NODE_ID
 
-...substituting `NODE_ID` for the ID of the chosen node. For example, in my case `gke-webapp-default-pool-49338587-d78l` was what I needed. Now you have a persistent disk attached to your node!
+...substituting `NODE_ID` for the ID of the chosen node. For example, in my case `gke-webapp-default-pool-49338587-d78l` was what I needed. 
+
+Now you have a persistent disk attached to your node. Finally, follow the instructions at ["Add persistent disk"](https://cloud.google.com/compute/docs/disks/add-persistent-disk#create_disk) on formatting the disk. Use `subway-explorer-datastore` for the `[MNT_DIR]` mentioned there.
 
 ### Step 4: Copy the database to the volume
 
@@ -104,7 +101,6 @@ following:
 Now deploy the API service.
 
 ```sh
-kubectl create configmap database-config-map --from-env-file=api-database-config-map.env
 kubectl create -f subway-explorer-api-deployment.yaml
 kubectl create -f subway-explorer-api-service.yaml
 ```
@@ -131,13 +127,28 @@ npx mocha test
 
 It's finally time to spin up the application front-end, [`subway-explorer-webapp`](https://github.com/ResidentMario/subway-explorer-webapp).
 
-TODO: Routing.
+Create a configuration map at `webapp-config-map.env`. This map tells the web app the URIs of the services that it needs to be talking to. The contents of the file should look something like this:
+
+```
+SUBWAY_EXPLORER_SERVICE_URI=http://URI:PORT
+GMAPS_PROXY_SERVICE_URI=http://URI:PORT
+```
+
+Substituting the `URI` and `PORT` info for the respective values configured in your application. Assuming you have the services already defined (as per the instructions thus far), you can discover this information by inspecting the output of `kubectl get svc`.
+
+
+```sh
+kubectl create configmap webapp-config-map --from-env-file=webapp-config-map.env
+```
 
 Now deploy the application.
 
 ```sh
-kubectl create configmap webapp-config-map --from-env-file=webapp-config-map.env
-kubectl create -f subway-explorer-api-deployment.yaml
-kubectl create -f subway-explorer-api-service.yaml
+kubectl create -f subway-explorer-webapp-deployment.yaml
+kubectl create -f subway-explorer-webapp-service.yaml
 ```
-```
+
+To test that the web application is working correctly, inspect `kubectl get svc` to see what the external IP is, then navigate to `IP:PORT` ( `PORT=8080` by default) to view the application!
+
+## To Do
+* Set CORS variables in the APIs from an environment variable to authorize these APIs for my application only (currently they are public).
