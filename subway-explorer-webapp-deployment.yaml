@@ -15,3 +15,16 @@ spec:
           ports:
             - name: http
               containerPort: 8080
+          env:
+            - name: GMAPS_PROXY_SERVICE_URI
+              valueFrom:
+                configMapKeyRef:
+                  name: webapp-config-map  
+                  key: GMAPS_PROXY_SERVICE_URI
+            - name: SUBWAY_EXPLORER_SERVICE_URI
+              valueFrom:
+                configMapKeyRef:
+                  name: webapp-config-map
+                  key: SUBWAY_EXPLORER_SERVICE_URI
+          command: ["/bin/sh"]
+          args: ["./scripts/build.sh"]
