@@ -6,8 +6,8 @@ metadata:
     app: subway-explorer-webapp-service
 spec:
   ports:
-  - port: 3000
+  - port: 8080
     protocol: TCP
   selector:
     app: subway-explorer-webapp-pod
-
+  type: LoadBalancer
