@@ -101,7 +101,7 @@ following:
 
     kubectl create configmap database-config-map --from-env-file=api-database-config-map.env
 
-Great, now you're ready to deploy the API service!
+Now deploy the API service.
 
 ```sh
 kubectl create configmap database-config-map --from-env-file=api-database-config-map.env
@@ -131,6 +131,13 @@ npx mocha test
 
 It's finally time to spin up the application front-end, [`subway-explorer-webapp`](https://github.com/ResidentMario/subway-explorer-webapp).
 
-Note: https://stackoverflow.com/a/49216574/1993206
+TODO: Routing.
 
-TODO
+Now deploy the application.
+
+```sh
+kubectl create configmap webapp-config-map --from-env-file=webapp-config-map.env
+kubectl create -f subway-explorer-api-deployment.yaml
+kubectl create -f subway-explorer-api-service.yaml
+```
+```
